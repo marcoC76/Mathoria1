@@ -1,3 +1,4 @@
+
 import { World, MindMapNode, InfographicPoint, Mission, CourseStep } from '../types';
 
 // --- MIND MAP DATA ---
@@ -207,6 +208,137 @@ const getSpecificStep = (worldId: string, missionIndex: number): CourseStep => {
             { q: "Traduce: 'El doble de un número'", options: ["x+2", "x²", "2x", "x/2"], correct: 2, damageToBoss: 30, damageToPlayer: 20 },
             { q: "Si y=5, valora: 3y - 1", options: ["14", "4", "15", "12"], correct: 0, damageToBoss: 30, damageToPlayer: 25 },
             { q: "¿Coeficiente de -x?", options: ["1", "0", "-1", "x"], correct: 2, damageToBoss: 40, damageToPlayer: 30 }
+          ]
+        }
+      }
+    ];
+    return steps[missionIndex] || defaultStep;
+  }
+
+  // --- MUNDO 2: SIGNOS ---
+  else if (worldId === "w2") {
+    const steps: CourseStep[] = [
+      { 
+        id: "s1", type: "quiz", title: "Más allá del Cero",
+        content: "Hasta ahora conocías los números naturales (1, 2, 3...). Pero el mundo se duplica bajo el cero. Los números negativos representan deuda, profundidad o retroceso.",
+        theory: "El Cero es el espejo. A la derecha están los positivos (+), a la izquierda los negativos (-).",
+        quizData: { 
+            question: "¿Qué número representa una deuda de 5 monedas?", 
+            options: ["5", "-5", "0", "0.5"], 
+            correctIndex: 1, 
+            explanation: "Las deudas y pérdidas se representan con números negativos (-)." 
+        }
+      },
+      { 
+        id: "s2", type: "minigame", title: "Detector de Polaridad",
+        theory: "Los números negativos siempre llevan un guion delante (-). Si un número no tiene signo, es positivo (excepto el 0 que es neutro).",
+        minigameData: {
+          instruction: "Selecciona solo los números **NEGATIVOS**:",
+          options: [
+            { text: "5", isCorrect: false, feedback: "Es positivo." },
+            { text: "-3", isCorrect: true, feedback: "Correcto, es menor que cero." },
+            { text: "0", isCorrect: false, feedback: "El cero es neutro." },
+            { text: "-100", isCorrect: true, feedback: "Muy negativo." }
+          ]
+        }
+      },
+      { 
+        id: "s3", type: "memory", title: "Leyes del Choque",
+        theory: "Al MULTIPLICAR o DIVIDIR: Amigos (signos iguales) dan Positivo. Enemigos (signos distintos) dan Negativo.",
+        memoryData: {
+            pairs: [
+                { id: 1, term: "(+) por (+)", definition: "Positivo (+)" },
+                { id: 2, term: "(-) por (-)", definition: "Positivo (+)" },
+                { id: 3, term: "(+) por (-)", definition: "Negativo (-)" },
+                { id: 4, term: "Signos Distintos", definition: "Resultado Negativo" }
+            ]
+        }
+      },
+      { 
+        id: "s4", type: "quiz", title: "Guerra de Sumas",
+        content: "Al sumar números con diferente signo, ocurre una batalla. Se RESTAN sus valores absolutos y gana el signo del número más poderoso (mayor valor absoluto).",
+        theory: "Ejemplo: -5 + 8. Gana el 8 (Positivo) por diferencia de 3. Resultado: +3.",
+        quizData: { question: "Calcula: -10 + 4", options: ["14", "-14", "-6", "6"], correctIndex: 2, explanation: "Signos distintos se restan (10-4=6). Gana el negativo (-10). Resultado -6." }
+      },
+      { 
+        id: "s5", type: "puzzle", title: "Escalera Térmica",
+        theory: "En los negativos, mientras 'más grande' parece el número, más pequeño es su valor real porque está más lejos del cero a la izquierda. -100 es menor que -1.",
+        puzzleData: {
+            instruction: "Ordena de MENOR (más frío) a MAYOR (más caliente):",
+            items: ["-10", "-2", "0", "5"],
+            correctOrder: [0, 1, 2, 3], // -10, -2, 0, 5
+            feedback: "¡Orden correcto! Recuerda: -10 es más pequeño que -2."
+        }
+      },
+      { 
+        id: "s6", type: "alchemy", title: "Equilibrio Cero",
+        theory: "Para destruir un número, debes sumar su OPUESTO. El opuesto de 5 es -5. Juntos crean la nada (Cero).",
+        alchemyData: { 
+            goalMessage: "Crea el Cero Absoluto (0) combinando opuestos.", 
+            correctCombination: ["pos", "neg"], //IDs
+            ingredients: [
+                {id: "pos", label: "3"},
+                {id: "neg", label: "-3"},
+                {id: "wrong1", label: "0"},
+                {id: "wrong2", label: "3"},
+                {id: "wrong3", label: "-2"},
+            ],
+            feedbackSuccess: "¡Anulación exitosa! 3 + (-3) = 0",
+            feedbackError: "Esos números no se cancelan entre sí."
+        }
+      },
+      { 
+        id: "s7", type: "maze", title: "Camino Positivo",
+        theory: "¡Cuidado! Multiplicar un negativo por otro negativo crea un positivo. Pero multiplicar un positivo por un negativo crea un agujero negro (negativo).",
+        mazeData: {
+          instruction: "Avanza solo por casillas cuyo resultado sea **POSITIVO (+)**:",
+          gridSize: 4,
+          startIdx: 0,
+          endIdx: 15,
+          cells: [
+            { content: "INICIO", isValid: true }, { content: "(-2)*(-2)", isValid: true }, { content: "-5 * 1", isValid: false }, { content: "-1 * 4", isValid: false },
+            { content: "-8 + 2", isValid: false }, { content: "10 / 2", isValid: true }, { content: "-3 * -3", isValid: true }, { content: "-2 + -2", isValid: false },
+            { content: "0 - 5", isValid: false }, { content: "4 + 4", isValid: true }, { content: "-10 / 5", isValid: false }, { content: "-1 * -1", isValid: true },
+            { content: "-9 + 1", isValid: false }, { content: "(-5)²", isValid: true }, { content: "2 - 10", isValid: false }, { content: "META", isValid: true }
+          ],
+          feedbackSuccess: "¡Has sobrevivido a la negatividad!",
+          feedbackError: "Caíste en un resultado negativo."
+        }
+      },
+      { 
+        id: "s8", type: "cryptex", title: "Criptex Negativo",
+        theory: "Resuelve las operaciones para obtener el código. Recuerda: |-5| es valor absoluto (siempre positivo).",
+        cryptexData: {
+            instruction: "Calcula los valores (X, Y, Z):",
+            wheels: [
+                { label: "X", clue: "x = (-2) * (-3)", correctValue: 6 },
+                { label: "Y", clue: "y = 10 + (-8)", correctValue: 2 },
+                { label: "Z", clue: "z = |-5|", correctValue: 5 } // Absolute value is 5
+            ],
+            feedbackSuccess: "¡Sello roto! Dominas los signos."
+        }
+      },
+      { 
+        id: "s9", type: "minigame", title: "Reflejos de División",
+        theory: "La ley de signos en división es idéntica a la multiplicación. (-) / (-) = (+).",
+        minigameData: {
+          instruction: "Selecciona las operaciones correctas:",
+          options: [
+            { text: "-10 / -2 = 5", isCorrect: true, feedback: "Correcto. Menos entre menos es más." },
+            { text: "-20 / 2 = 10", isCorrect: false, feedback: "Error. Debería ser -10." },
+            { text: "15 / -3 = -5", isCorrect: true, feedback: "Bien. Más entre menos es menos." }
+          ]
+        }
+      },
+      { 
+        id: "s10", type: "boss", title: "El Golem Polar",
+        theory: "¡Prepárate! Este guardián cambia de polaridad. Usa paréntesis mentalmente: -(-5) se convierte en +5. ¡No falles en el signo!",
+        bossData: {
+          name: "Golem de Hielo y Fuego", hp: 120, playerMaxHp: 100, assetId: "golem",
+          questions: [
+            { q: "Resuelve: -5 - (-5)", options: ["-10", "0", "10", "-25"], correct: 1, damageToBoss: 40, damageToPlayer: 20 },
+            { q: "Calcula: (-3) * 4 * (-2)", options: ["-24", "12", "24", "-12"], correct: 2, damageToBoss: 40, damageToPlayer: 25 }, // 24 positive
+            { q: "¿Cuál es mayor?", options: ["-100", "-1", "0", "-50"], correct: 2, damageToBoss: 40, damageToPlayer: 30 } // 0 is larger than negatives
           ]
         }
       }
