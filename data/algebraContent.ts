@@ -1,4 +1,5 @@
 
+
 import { World, MindMapNode, InfographicPoint, Mission, CourseStep } from '../types';
 
 // --- MIND MAP DATA ---
@@ -280,7 +281,7 @@ const getSpecificStep = (worldId: string, missionIndex: number): CourseStep => {
                 {id: "pos", label: "3"},
                 {id: "neg", label: "-3"},
                 {id: "wrong1", label: "0"},
-                {id: "wrong2", label: "3"},
+                {id: "wrong2", label: "4"},
                 {id: "wrong3", label: "-2"},
             ],
             feedbackSuccess: "¡Anulación exitosa! 3 + (-3) = 0",
@@ -299,7 +300,7 @@ const getSpecificStep = (worldId: string, missionIndex: number): CourseStep => {
             { content: "INICIO", isValid: true }, { content: "(-2)*(-2)", isValid: true }, { content: "-5 * 1", isValid: false }, { content: "-1 * 4", isValid: false },
             { content: "-8 + 2", isValid: false }, { content: "10 / 2", isValid: true }, { content: "-3 * -3", isValid: true }, { content: "-2 + -2", isValid: false },
             { content: "0 - 5", isValid: false }, { content: "4 + 4", isValid: true }, { content: "-10 / 5", isValid: false }, { content: "-1 * -1", isValid: true },
-            { content: "-9 + 1", isValid: false }, { content: "(-5)²", isValid: true }, { content: "2 - 10", isValid: false }, { content: "META", isValid: true }
+            { content: "-9 + 1", isValid: false }, { content: "(-5)²", isValid: true }, { content: "20 - 10", isValid: true }, { content: "META", isValid: true }
           ],
           feedbackSuccess: "¡Has sobrevivido a la negatividad!",
           feedbackError: "Caíste en un resultado negativo."
@@ -345,48 +346,158 @@ const getSpecificStep = (worldId: string, missionIndex: number): CourseStep => {
     ];
     return steps[missionIndex] || defaultStep;
   }
+  
+  // --- MUNDO 3: EXPONENTES ---
+  else if (worldId === "w3") {
+      const steps: CourseStep[] = [
+        { id: "s1", type: "quiz", title: "El Multiplicador Sagrado",
+          content: "Un exponente es un pequeño número flotante que indica cuántas veces multiplicas la base por sí misma. x³ = x·x·x.", theory: "Base: el número grande. Exponente: el pequeño.",
+          quizData: { question: "¿Qué significa 2³?", options: ["2+2+2", "2x3", "2x2x2", "3x3"], correctIndex: 2, explanation: "Es la base multiplicada 3 veces." } },
+        { id: "s2", type: "memory", title: "La Ley del Cero",
+          theory: "Cualquier número (excepto 0) elevado a la potencia CERO es igual a 1. ¡Es una ley universal!",
+          memoryData: { pairs: [{ id: 1, term: "x⁰", definition: "1" }, { id: 2, term: "5⁰", definition: "1" }, { id: 3, term: "Base", definition: "Número inferior" }] } },
+        { id: "s3", type: "alchemy", title: "Fusión de Poderes",
+          theory: "Ley del Producto: Si multiplicas bases iguales, SUMA los exponentes. x² · x³ = x⁵.",
+          alchemyData: { goalMessage: "Combina potencias para crear x⁵ (Multiplicación)", correctCombination: ["x2", "x3"], ingredients: [{id:"x2", label:"x²"}, {id:"x3", label:"x³"}, {id:"x4", label:"x⁴"}, {id:"plus", label:"+"}], feedbackSuccess: "¡Correcto! 2+3=5", feedbackError: "Recuerda: los exponentes se suman." } },
+        { id: "s4", type: "minigame", title: "Potencia de Potencia",
+          theory: "Si elevas una potencia a otra potencia, MULTIPLICA los exponentes. (x²)³ = x⁶.",
+          minigameData: { instruction: "Selecciona la equivalencia correcta para (a⁴)²", options: [{text:"a⁶", isCorrect:false, feedback:"No sumes."}, {text:"a⁸", isCorrect:true, feedback:"¡Sí! 4x2=8"}, {text:"a¹⁶", isCorrect:false, feedback:"No eleves el exponente."}] } },
+        { id: "s5", type: "puzzle", title: "Secuencia Exponencial",
+          theory: "Ordena las operaciones para simplificar (2x)³ = 2³ · x³ = 8x³.",
+          puzzleData: { instruction: "Ordena los pasos de simplificación de (2x)²:", items: ["(2x)²", "2² · x²", "4x²"], correctOrder: [0, 1, 2], feedback: "Lógica perfecta." } },
+        { id: "s6", type: "maze", title: "Ruta de Simplificación",
+          theory: "Sigue el camino donde la simplificación sea correcta.",
+          mazeData: { instruction: "Pisa las igualdades VERDADERAS:", gridSize: 3, startIdx: 0, endIdx: 8, cells: [{content:"INICIO", isValid:true}, {content:"x²·x=x³", isValid:true}, {content:"x²+x²=x⁴", isValid:false}, {content:"(x²)³=x⁵", isValid:false}, {content:"x⁵/x²=x³", isValid:true}, {content:"x⁰=0", isValid:false}, {content:"2x²=4x", isValid:false}, {content:"(xy)²=x²y²", isValid:true}, {content:"META", isValid:true}], feedbackSuccess: "¡Has cruzado el laberinto!", feedbackError: "Esa igualdad es falsa." } },
+        { id: "s7", type: "cryptex", title: "Código de Exponente",
+          theory: "Encuentra el exponente que falta. xᵃ · x³ = x⁷ -> a + 3 = 7 -> a = 4.",
+          cryptexData: { instruction: "Halla el valor del exponente desconocido:", wheels: [{label:"A", clue:"xᵃ · x² = x⁵", correctValue:3}, {label:"B", clue:"(x²)ᵇ = x⁸", correctValue:4}, {label:"C", clue:"xᶜ / x = x", correctValue:2}], feedbackSuccess: "¡Sistema desbloqueado!" } },
+        { id: "s8", type: "quiz", title: "División de Poderes",
+          theory: "Al dividir bases iguales, RESTA los exponentes. x⁵ / x² = x³.",
+          quizData: { question: "Simplifica: x¹⁰ / x³", options: ["x¹³", "x⁷", "x³⁰", "x⁻⁷"], correctIndex: 1, explanation: "10 - 3 = 7." } },
+        { id: "s9", type: "minigame", title: "Negatividad",
+          theory: "Un exponente negativo invierte la base. x⁻¹ = 1/x.",
+          minigameData: { instruction: "Selecciona lo cierto:", options: [{text:"x⁻² = -x²", isCorrect:false, feedback:"No es negativo el número, es inversión."}, {text:"x⁻² = 1/x²", isCorrect:true, feedback:"¡Correcto! Inverso."}, {text:"x⁻² = √x", isCorrect:false, feedback:"No es raíz."}] } },
+        { id: "s10", type: "boss", title: "Dragón Exponencial",
+          theory: "Combina todas las leyes. (x²y)³ = x⁶y³. x⁵/x⁵ = x⁰ = 1.",
+          bossData: { name: "Draco de la Potencia", hp: 150, playerMaxHp: 100, assetId: "dragon_red", questions: [{q:"Simplifica (x³)² · x", options:["x⁷","x⁶","x⁵","x⁹"], correct:0, damageToBoss:50, damageToPlayer:20}, {q:"Calcula 2⁻²", options:["-4","1/4","4","-2"], correct:1, damageToBoss:50, damageToPlayer:25}, {q:"Valor de 100⁰", options:["0","1","100","Indefinido"], correct:1, damageToBoss:50, damageToPlayer:30}] } }
+      ];
+      return steps[missionIndex] || defaultStep;
+  }
 
-  // Fallback for other worlds
+  // --- MUNDO 4: POLINOMIOS ---
+  else if (worldId === "w4") {
+      const steps: CourseStep[] = [
+        { id: "s1", type: "quiz", title: "La Legión Algebraica", content: "Un polinomio es una suma de términos. Cada término tiene un coeficiente y una variable. 3x² + 2x - 5.", theory: "Grado: El exponente más alto.", quizData: { question: "¿Cuál es el GRADO de 4x³ + 2x?", options: ["1", "2", "3", "4"], correctIndex: 2, explanation: "El exponente mayor es 3." } },
+        { id: "s2", type: "minigame", title: "Clasificación de Tropas", theory: "1 término = Monomio. 2 términos = Binomio. 3 términos = Trinomio.", minigameData: { instruction: "Selecciona los **BINOMIOS**:", options: [{text:"x + y", isCorrect:true, feedback:"Dos términos."}, {text:"3x²", isCorrect:false, feedback:"Monomio."}, {text:"a - b", isCorrect:true, feedback:"Dos términos."}] } },
+        { id: "s3", type: "alchemy", title: "Suma de Fuerzas", theory: "Solo puedes sumar términos semejantes (mismas letras y exponentes).", alchemyData: { goalMessage: "Crea **5x** sumando términos.", correctCombination: ["2x", "3x"], ingredients: [{id:"2x", label:"2x"}, {id:"3x", label:"3x"}, {id:"x2", label:"x²"}, {id:"5", label:"5"}], feedbackSuccess: "¡Fusión exitosa!", feedbackError: "No son semejantes o suma incorrecta." } },
+        { id: "s4", type: "memory", title: "Pares Semejantes", theory: "Encuentra las parejas que se pueden sumar.", memoryData: { pairs: [{ id: 1, term: "3ab", definition: "-ab" }, { id: 2, term: "x²", definition: "5x²" }, { id: 3, term: "Constante", definition: "Número solo" }] } },
+        { id: "s5", type: "quiz", title: "Resta Traicionera", theory: "Para restar un polinomio, cambia el signo de TODOS los términos del segundo grupo. -(3x - 2) se vuelve -3x + 2.", quizData: { question: "Resultado de (5x) - (2x + 1)", options: ["3x + 1", "3x - 1", "7x + 1", "3x"], correctIndex: 1, explanation: "5x - 2x - 1 = 3x - 1." } },
+        { id: "s6", type: "puzzle", title: "Orden de Batalla", theory: "Escribe los polinomios en orden descendente de grado (mayor a menor exponente).", puzzleData: { instruction: "Ordena: 3 + x² - 2x", items: ["x²", "-2x", "+3"], correctOrder: [0, 1, 2], feedback: "Forma estándar alcanzada." } },
+        { id: "s7", type: "maze", title: "Camino Monomio", theory: "Cruza pisando solo MONOMIOS (un solo término).", mazeData: { instruction: "Solo Monomios:", gridSize: 3, startIdx: 0, endIdx: 8, cells: [{content:"INICIO", isValid:true}, {content:"3xyz", isValid:true}, {content:"x+y", isValid:false}, {content:"a-b", isValid:false}, {content:"-5x²", isValid:true}, {content:"3+x", isValid:false}, {content:"x²+y²", isValid:false}, {content:"8", isValid:true}, {content:"META", isValid:true}], feedbackSuccess: "Ruta despejada.", feedbackError: "Eso es un polinomio." } },
+        { id: "s8", type: "cryptex", title: "Coeficientes Perdidos", theory: "Suma los coeficientes: (2x) + (3x) = 5x. 2+3=5.", cryptexData: { instruction: "Halla A y B: Ax + Bx = 10x", wheels: [{label:"A (Si B=3)", clue:"A+3=10", correctValue:7}, {label:"B (Si A=5)", clue:"5+B=10", correctValue:5}], feedbackSuccess: "Cálculo preciso." } },
+        { id: "s9", type: "minigame", title: "Evaluación Rápida", theory: "Evaluar es sustituir la x por un número. Si x=2, entonces 3x = 6.", minigameData: { instruction: "Evalúa x² + 1 si x=3", options: [{text:"7", isCorrect:false, feedback:"3² es 9."}, {text:"10", isCorrect:true, feedback:"9+1=10."}, {text:"6", isCorrect:false, feedback:"No es 3x2."}] } },
+        { id: "s10", type: "boss", title: "General Polinomio", theory: "Combate final de términos. Agrupa semejantes y ordena.", bossData: { name: "General Poly", hp: 180, playerMaxHp: 100, assetId: "skull_lord", questions: [{q:"Suma: (2x+1) + (3x-5)", options:["5x-4","5x+6","6x-5","5x+4"], correct:0, damageToBoss:60, damageToPlayer:20}, {q:"Grado de 5x⁴ - 2x³ + 1", options:["3","5","4","1"], correct:2, damageToBoss:60, damageToPlayer:20}, {q:"Resta: 5x - (x - 2)", options:["4x-2","4x+2","6x-2","4x"], correct:1, damageToBoss:60, damageToPlayer:25}] } }
+      ];
+      return steps[missionIndex] || defaultStep;
+  }
+
+  // --- MUNDO 5: PRODUCTOS NOTABLES ---
+  else if (worldId === "w5") {
+      const steps: CourseStep[] = [
+        { id: "s1", type: "quiz", title: "Expansión Básica", content: "Propiedad Distributiva: a(b+c) = ab + ac. El término de afuera multiplica a TODOS los de adentro.", theory: "Flechas multiplicadoras.", quizData: { question: "Expande: 2(x + 3)", options: ["2x + 3", "2x + 6", "x + 6", "2x + 5"], correctIndex: 1, explanation: "2 por x y 2 por 3." } },
+        { id: "s2", type: "alchemy", title: "Binomio al Cuadrado", theory: "(a+b)² = a² + 2ab + b². ¡No olvides el término del medio!", alchemyData: { goalMessage: "Construye (x+1)²", correctCombination: ["x2", "2x", "1"], ingredients: [{id:"x2", label:"x²"}, {id:"2x", label:"2x"}, {id:"1", label:"1"}, {id:"x", label:"x"}], feedbackSuccess: "Trinomio Cuadrado Perfecto.", feedbackError: "Falta el término central." } },
+        { id: "s3", type: "minigame", title: "Diferencia de Cuadrados", theory: "El par conjugado: (a+b)(a-b) = a² - b². Los términos centrales se cancelan.", minigameData: { instruction: "Resultado de (x-3)(x+3)", options: [{text:"x² - 9", isCorrect:true, feedback:"¡Exacto!"}, {text:"x² + 9", isCorrect:false, feedback:"El signo es menos."}, {text:"x² - 6x + 9", isCorrect:false, feedback:"No hay término medio."}] } },
+        { id: "s4", type: "puzzle", title: "Método FOIL", theory: "First, Outer, Inner, Last. (x+2)(x+3) = x² + 3x + 2x + 6.", puzzleData: { instruction: "Ordena los pasos de (x+1)(x+2):", items: ["x² (x·x)", "+ 3x (Suma)", "+ 2 (1·2)"], correctOrder: [0, 1, 2], feedback: "Secuencia lógica correcta." } },
+        { id: "s5", type: "memory", title: "Patrones Geométricos", theory: "Asocia la fórmula con su nombre.", memoryData: { pairs: [{ id: 1, term: "(a+b)²", definition: "Trinomio Cuadrado Perfecto" }, { id: 2, term: "(a+b)(a-b)", definition: "Diferencia de Cuadrados" }, { id: 3, term: "x(a+b)", definition: "Distributiva" }] } },
+        { id: "s6", type: "maze", title: "Ruta del Cuadrado", theory: "Sigue las expansiones correctas.", mazeData: { instruction: "Pisa verdades:", gridSize: 3, startIdx: 0, endIdx: 8, cells: [{content:"INICIO", isValid:true}, {content:"(x+2)²=x²+4", isValid:false}, {content:"(x+1)²=x²+2x+1", isValid:true}, {content:"(x-1)²=x²-2x+1", isValid:true}, {content:"2(x+1)=2x+2", isValid:true}, {content:"(x-2)(x+2)=x²-4", isValid:true}, {content:"x²·x²=2x²", isValid:false}, {content:"x(x)=2x", isValid:false}, {content:"META", isValid:true}], feedbackSuccess: "¡Has evitado los errores comunes!", feedbackError: "Caíste en la trampa del binomio." } },
+        { id: "s7", type: "cryptex", title: "El Término Fantasma", theory: "En (x+5)², el término del medio es 2·x·5 = 10x.", cryptexData: { instruction: "Halla el coeficiente medio 'K':", wheels: [{label:"(x+3)² -> Kx", clue:"2*3", correctValue:6}, {label:"(x-4)² -> Kx", clue:"2*4 (negativo ignora)", correctValue:8}], feedbackSuccess: "Doble producto hallado." } },
+        { id: "s8", type: "quiz", title: "Productos Rápidos", theory: "(x+a)(x+b) = x² + (a+b)x + ab.", quizData: { question: "(x+2)(x+5)", options: ["x² + 7x + 10", "x² + 10x + 7", "x² + 7x + 7", "x² + 10"], correctIndex: 0, explanation: "Suma 2+5=7, Multiplica 2*5=10." } },
+        { id: "s9", type: "minigame", title: "Identifica el Error", theory: "El error más común es olvidar el término medio en (a+b)².", minigameData: { instruction: "¿Cuál es CORRECTO?", options: [{text:"(x+3)² = x² + 9", isCorrect:false, feedback:"¡Falta 6x!"}, {text:"(x+3)² = x² + 6x + 9", isCorrect:true, feedback:"Perfecto."}] } },
+        { id: "s10", type: "boss", title: "Arquitecto de Fórmulas", theory: "Usa los atajos mentales. No multipliques todo si conoces la fórmula.", bossData: { name: "El Constructor", hp: 200, playerMaxHp: 100, assetId: "dwarf", questions: [{q:"Expande (x-5)²", options:["x²-25","x²-10x+25","x²+25","x²-5x+25"], correct:1, damageToBoss:70, damageToPlayer:25}, {q:"(2x+1)(2x-1)", options:["4x²-1","2x²-1","4x-1","4x²+1"], correct:0, damageToBoss:70, damageToPlayer:25}, {q:"(x+2)(x+3)", options:["x²+5x+6","x²+6x+5","x²+5x+5"], correct:0, damageToBoss:60, damageToPlayer:20}] } }
+      ];
+      return steps[missionIndex] || defaultStep;
+  }
+
+  // --- MUNDO 6: FACTORIZACIÓN ---
+  else if (worldId === "w6") {
+      const steps: CourseStep[] = [
+        { id: "s1", type: "quiz", title: "Ingeniería Inversa", content: "Factorizar es lo opuesto a multiplicar. Es convertir una suma en un producto. x² + x -> x(x+1).", theory: "Busca qué tienen en común.", quizData: { question: "¿Qué tienen en común 4x y 8?", options: ["x", "4", "8", "2x"], correctIndex: 1, explanation: "Ambos son divisibles por 4." } },
+        { id: "s2", type: "minigame", title: "Factor Común (GCF)", theory: "El Factor Común Mayor es el número/letra más grande que divide a todos.", minigameData: { instruction: "Factor común de 3x² + 6x", options: [{text:"3", isCorrect:false, feedback:"Falta la x."}, {text:"3x", isCorrect:true, feedback:"Correcto, divide a ambos."}, {text:"x", isCorrect:false, feedback:"Falta el 3."}] } },
+        { id: "s3", type: "alchemy", title: "Descomposición", theory: "Rompe x² - 16 en dos paréntesis.", alchemyData: { goalMessage: "Factoriza x² - 16", correctCombination: ["x+4", "x-4"], ingredients: [{id:"x+4", label:"(x+4)"}, {id:"x-4", label:"(x-4)"}, {id:"x-8", label:"(x-8)"}, {id:"x+2", label:"(x+2)"}], feedbackSuccess: "Diferencia de Cuadrados perfecta.", feedbackError: "Recuerda: raíz de 16 es 4." } },
+        { id: "s4", type: "memory", title: "Parejas de Raíces", theory: "Encuentra dos números que multiplicados den C y sumados den B.", memoryData: { pairs: [{ id: 1, term: "Multiplican 6, Suman 5", definition: "2 y 3" }, { id: 2, term: "Multiplican 12, Suman 7", definition: "3 y 4" }, { id: 3, term: "Multiplican 9, Suman 6", definition: "3 y 3" }] } },
+        { id: "s5", type: "puzzle", title: "Trinomio Simple", theory: "x² + bx + c. Paso 1: paréntesis (x )(x ). Paso 2: Signos. Paso 3: Números.", puzzleData: { instruction: "Pasos para x² + 5x + 6:", items: ["(x   )(x   )", "(x + )(x + )", "(x + 2)(x + 3)"], correctOrder: [0, 1, 2], feedback: "Estructura correcta." } },
+        { id: "s6", type: "maze", title: "Ruta de Primos", theory: "Avanza por polinomios que NO se pueden factorizar más (Irreducibles o Primos).", mazeData: { instruction: "Solo polinomios PRIMOS:", gridSize: 3, startIdx: 0, endIdx: 8, cells: [{content:"INICIO", isValid:true}, {content:"x+1", isValid:true}, {content:"x²-4", isValid:false}, {content:"2x+2", isValid:false}, {content:"x²+1", isValid:true}, {content:"x²-9", isValid:false}, {content:"3x+9", isValid:false}, {content:"x-5", isValid:true}, {content:"META", isValid:true}], feedbackSuccess: "Has encontrado los elementos puros.", feedbackError: "Ese se podía factorizar." } },
+        { id: "s7", type: "cryptex", title: "Buscando Raíces", theory: "Si (x-3)(x+2) = 0, las raíces son x=3 y x=-2. ¡Cambia el signo!", cryptexData: { instruction: "Halla la raíz positiva:", wheels: [{label:"x²-25=0", clue:"Raíz de 25", correctValue:5}, {label:"(x-7)(x+2)=0", clue:"El valor que anula x-7", correctValue:7}], feedbackSuccess: "Raíces halladas." } },
+        { id: "s8", type: "quiz", title: "Trinomio Cuadrado", theory: "Si el primero y el último tienen raíz exacta, comprueba el doble producto.", quizData: { question: "Factoriza x² + 2x + 1", options: ["(x+1)(x-1)", "(x+1)²", "(x+2)(x-1)"], correctIndex: 1, explanation: "Es un trinomio cuadrado perfecto." } },
+        { id: "s9", type: "minigame", title: "Agrupación", theory: "Si hay 4 términos, agrupa en parejas. ax + ay + bx + by = a(x+y) + b(x+y).", minigameData: { instruction: "Primer paso para: x³ + x² + 2x + 2", options: [{text:"x²(x+1) + 2(x+1)", isCorrect:true, feedback:"Bien agrupado."}, {text:"x(x²+x+2)+2", isCorrect:false, feedback:"No ayuda."}] } },
+        { id: "s10", type: "boss", title: "El Divisor", theory: "Reconoce el patrón. ¿Diferencia de cuadrados o Trinomio?", bossData: { name: "The Splitter", hp: 200, playerMaxHp: 100, assetId: "alien", questions: [{q:"Factoriza x² - 81", options:["(x-9)²","(x+9)(x-9)","(x-81)(x+1)"], correct:1, damageToBoss:70, damageToPlayer:25}, {q:"Factoriza x² + 7x + 10", options:["(x+5)(x+2)","(x+10)(x+1)","(x+7)(x+1)"], correct:0, damageToBoss:70, damageToPlayer:25}, {q:"Factor común: 5x³ - 5x", options:["5x(x²-1)","5(x³-x)","x(5x²-5)"], correct:0, damageToBoss:60, damageToPlayer:20}] } }
+      ];
+      return steps[missionIndex] || defaultStep;
+  }
+
+  // --- MUNDO 7: ECUACIONES ---
+  else if (worldId === "w7") {
+      const steps: CourseStep[] = [
+        { id: "s1", type: "quiz", title: "La Balanza", content: "Resolver es dejar la 'x' sola. Lo que hagas a un lado, debemos hacerlo al otro para mantener el equilibrio.", theory: "Objetivo: x = número.", quizData: { question: "Si x + 5 = 10, ¿qué hago?", options: ["Resto 5 a ambos lados", "Sumo 5 a ambos lados", "Resto 10"], correctIndex: 0, explanation: "Operación inversa: +5 pasa como -5." } },
+        { id: "s2", type: "minigame", title: "Operación Inversa", theory: "Suma <-> Resta. Multiplicación <-> División.", minigameData: { instruction: "Para eliminar el 3 en '3x = 12', debo...", options: [{text:"Restar 3", isCorrect:false, feedback:"El 3 está multiplicando."}, {text:"Dividir por 3", isCorrect:true, feedback:"Correcto, inverso de multiplicar."}] } },
+        { id: "s3", type: "alchemy", title: "Equilibrio Químico", theory: "Resuelve 2x - 4 = 6. Primero suma 4, luego divide por 2.", alchemyData: { goalMessage: "Halla el valor de x en: **2x - 4 = 6**", correctCombination: ["5"], ingredients: [{id:"5", label:"5"}, {id:"2", label:"2"}, {id:"10", label:"10"}, {id:"6", label:"6"}], feedbackSuccess: "2(5)-4=6. Correcto.", feedbackError: "Error de cálculo." } },
+        { id: "s4", type: "puzzle", title: "Pasos de Resolución", theory: "Orden: 1. Sumas/Restas 2. Mult/Div.", puzzleData: { instruction: "Pasos para 2x + 1 = 9:", items: ["Restar 1 (2x = 8)", "Dividir por 2 (x = 4)", "Resolver"], correctOrder: [0, 1, 2], feedback: "Algoritmo correcto." } },
+        { id: "s5", type: "memory", title: "Traducción Real", theory: "Asocia la frase con la ecuación.", memoryData: { pairs: [{ id: 1, term: "Doble de un número es 10", definition: "2x = 10" }, { id: 2, term: "Número más 5 es 8", definition: "x + 5 = 8" }, { id: 3, term: "Mitad de un número", definition: "x / 2" }] } },
+        { id: "s6", type: "maze", title: "Camino de la Verdad", theory: "Sigue la ecuación hasta su solución.", mazeData: { instruction: "Conecta Ecuación -> Solución:", gridSize: 3, startIdx: 0, endIdx: 8, cells: [{content:"INICIO", isValid:true}, {content:"x+2=5 -> x=3", isValid:true}, {content:"2x=10 -> x=2", isValid:false}, {content:"x/2=4 -> x=2", isValid:false}, {content:"x-1=1 -> x=2", isValid:true}, {content:"3x=0 -> x=3", isValid:false}, {content:"5x=5 -> x=0", isValid:false}, {content:"x+x=10 -> x=5", isValid:true}, {content:"META", isValid:true}], feedbackSuccess: "Verdad alcanzada.", feedbackError: "Esa solución es falsa." } },
+        { id: "s7", type: "cryptex", title: "Incógnita Oculta", theory: "Resuelve mentalmente.", cryptexData: { instruction: "Resuelve:", wheels: [{label:"3x = 15", clue:"x = ?", correctValue:5}, {label:"x/2 = 4", clue:"x = ?", correctValue:8}], feedbackSuccess: "Valores correctos." } },
+        { id: "s8", type: "minigame", title: "Variables en Ambos Lados", theory: "Mueve las x a la izquierda y los números a la derecha. 3x = x + 4 -> 2x = 4.", minigameData: { instruction: "Primer paso en: 5x = 2x + 9", options: [{text:"Restar 2x", isCorrect:true, feedback:"Queda 3x = 9."}, {text:"Restar 9", isCorrect:false, feedback:"No agrupa las x."}] } },
+        { id: "s9", type: "quiz", title: "Paréntesis Primero", theory: "2(x+3)=10. Primero distribuye: 2x+6=10. Luego resuelve.", quizData: { question: "Resuelve: 3(x-1) = 6", options: ["x=2", "x=3", "x=1"], correctIndex: 1, explanation: "3x-3=6 -> 3x=9 -> x=3." } },
+        { id: "s10", type: "boss", title: "El Equilibrador", theory: "No entres en pánico. Paso a paso. Agrupa x, despeja.", bossData: { name: "Equilibrium", hp: 220, playerMaxHp: 100, assetId: "vampire", questions: [{q:"Resuelve: 4x + 2 = 14", options:["2","3","4","12"], correct:1, damageToBoss:70, damageToPlayer:25}, {q:"Resuelve: 2x = x + 5", options:["1","5","2.5","-5"], correct:1, damageToBoss:70, damageToPlayer:25}, {q:"3(x+1) = 12", options:["3","4","2"], correct:0, damageToBoss:80, damageToPlayer:20}] } }
+      ];
+      return steps[missionIndex] || defaultStep;
+  }
+
+  // --- MUNDO 8: SISTEMAS ---
+  else if (worldId === "w8") {
+      const steps: CourseStep[] = [
+        { id: "s1", type: "quiz", title: "Doble Verdad", content: "Un sistema son dos ecuaciones que deben ser verdad AL MISMO TIEMPO. La solución es donde se cruzan sus líneas.", theory: "Buscas (x, y).", quizData: { question: "¿Qué significa resolver un sistema?", options: ["Hallar dos líneas", "Hallar la intersección", "Sumar todo"], correctIndex: 1, explanation: "El punto común." } },
+        { id: "s2", type: "minigame", title: "Verificador", theory: "Prueba el punto (x,y) en las ecuaciones. ¿Cumple ambas?", minigameData: { instruction: "¿Es (2,1) solución de x+y=3?", options: [{text:"Sí", isCorrect:true, feedback:"2+1=3. Correcto."}, {text:"No", isCorrect:false, feedback:"La suma da 3."}] } },
+        { id: "s3", type: "alchemy", title: "Método de Suma", 
+          theory: "Al sumar dos ecuaciones, si una variable tiene coeficientes opuestos (como +y y -y), se anula al sumarlas. Ejemplo: x+y=5 y x-y=1 sumados dan 2x=6.", 
+          alchemyData: { 
+            goalMessage: "Suma este sistema para eliminar la 'Y':\n**x + y = 7**, \n**x - y = 3**", 
+            correctCombination: ["res_2x", "res_eq", "res_10"], 
+            ingredients: [
+                {id:"res_2x", label:"2x"}, 
+                {id:"res_eq", label:"="}, 
+                {id:"res_10", label:"10"},
+                {id:"res_2y", label:"2y"},
+                {id:"res_0", label:"0"},
+                {id:"res_4", label:"4"}
+            ], 
+            feedbackSuccess: "¡Y eliminada con éxito! La nueva ecuación es 2x = 10.", 
+            feedbackError: "Esa no es la ecuación resultante al sumar el sistema." 
+          } 
+        },
+        { id: "s4", type: "puzzle", title: "Sustitución Lógica", theory: "Si y = 2x, pon '2x' donde veas 'y' en la otra ecuación.", puzzleData: { instruction: "Pasos para sustituir y=x en y+x=4:", items: ["x + x = 4", "2x = 4", "x = 2"], correctOrder: [0, 1, 2], feedback: "Sustitución exitosa." } },
+        { id: "s5", type: "memory", title: "Métodos Maestros", theory: "Conoce tus herramientas.", memoryData: { pairs: [{ id: 1, term: "Sustitución", definition: "Reemplazar variable" }, { id: 2, term: "Eliminación", definition: "Sumar ecuaciones" }, { id: 3, term: "Gráfico", definition: "Dibujar líneas" }] } },
+        { id: "s6", type: "maze", title: "Coordenada Perdida", theory: "Sistema: x + y = 8, x - y = 4. \nBusca el camino donde x + y = 8 hasta encontrar la solución (6,2).", mazeData: { instruction: "Sigue pares donde x+y=8:", gridSize: 3, startIdx: 0, endIdx: 8, cells: [{content:"INICIO", isValid:true}, {content:"(4,4)", isValid:true}, {content:"(5,2)", isValid:false}, {content:"(1,6)", isValid:false}, {content:"(5,3)", isValid:true}, {content:"(8,1)", isValid:false}, {content:"(3,4)", isValid:false}, {content:"(6,2)", isValid:true}, {content:"META", isValid:true}], feedbackSuccess: "¡Coordenada (6,2) asegurada!", feedbackError: "La suma no es 8." } },
+        { id: "s7", type: "cryptex", title: "Sistema Binario", theory: "x+y=10, x-y=2. Suma: 2x=12 -> x=6. Resta: 2y=8 -> y=4.", cryptexData: { instruction: "Halla X e Y:", wheels: [{label:"X", clue:"x+y=6, x-y=0", correctValue:3}, {label:"Y", clue:"x=3, x+y=6", correctValue:3}], feedbackSuccess: "Coordenadas fijadas." } },
+        { id: "s8", type: "minigame", title: "Decisión Táctica", theory: "Si una ecuación dice 'y=...', usa Sustitución. Si están alineadas, usa Eliminación.", minigameData: { instruction: "Mejor método para: y=3x, 2x+y=10", options: [{text:"Sustitución", isCorrect:true, feedback:"Porque y está despejada."}, {text:"Eliminación", isCorrect:false, feedback:"Más lento aquí."}] } },
+        { id: "s9", type: "quiz", title: "Problema Verbal", theory: "Dos números suman 10. Su resta es 2. ¿Cuáles son?", quizData: { question: "x+y=10, x-y=2", options: ["6 y 4", "5 y 5", "8 y 2"], correctIndex: 0, explanation: "6+4=10, 6-4=2." } },
+        { id: "s10", type: "boss", title: "Paradoja Gemela", theory: "El reto final. Resuelve por el método que prefieras, pero rápido.", bossData: { name: "Gemini", hp: 250, playerMaxHp: 100, assetId: "demon", questions: [{q:"Sistema: x+y=8, x-y=4", options:["(6,2)","(4,4)","(5,3)"], correct:0, damageToBoss:80, damageToPlayer:25}, {q:"Sistema: y=x, x+y=10", options:["(5,5)","(10,0)","(2,8)"], correct:0, damageToBoss:80, damageToPlayer:25}, {q:"Sistema: 2x+y=5, x=1", options:["y=3","y=2","y=1"], correct:0, damageToBoss:90, damageToPlayer:30}] } }
+      ];
+      return steps[missionIndex] || defaultStep;
+  }
+
+  // Fallback for safety
   const genericTitles = ["Iniciación", "Práctica", "Teoría", "Lógica", "Simulación", "Estrategia", "Dominio", "Maestría", "Prueba", "Jefe"];
   const isBoss = missionIndex === 9;
-  const isPuzzle = missionIndex === 3 || missionIndex === 5;
-  const isMinigame = missionIndex === 1 || missionIndex === 4 || missionIndex === 7;
-  const type = isBoss ? 'boss' : isPuzzle ? 'puzzle' : 'quiz';
-
-  let step: CourseStep = {
-     id: `gen-${worldId}-${missionIndex}`,
-     type: type as any,
-     title: genericTitles[missionIndex],
-     theory: "Recuerda los principios básicos de este mundo. Lee atentamente el enunciado."
-  };
-
-  if (isBoss) {
-      step.bossData = {
-          name: "Guardián del Reino", hp: 100, playerMaxHp: 100, assetId: "dragon_red",
-          questions: [
-              { q: "¿Preparado para demostrar tu valor?", options: ["Sí", "Siempre", "Nunca", "Tal vez"], correct: 0, damageToBoss: 35, damageToPlayer: 10 },
-              { q: "Resuelve el acertijo final: x = x", options: ["Verdadero", "Falso"], correct: 0, damageToBoss: 35, damageToPlayer: 10 },
-              { q: "El golpe final...", options: ["¡Atacar!", "Defender"], correct: 0, damageToBoss: 30, damageToPlayer: 10 }
-          ]
-      }
-  } else if (isPuzzle) {
-      step.puzzleData = {
-          instruction: "Ordena la secuencia lógica:",
-          items: ["Paso 1", "Paso 2", "Paso 3"],
-          correctOrder: [0, 1, 2],
-          feedback: "Lógica impecable."
-      }
-  } else {
-      step.content = "Concepto avanzado de este mundo.";
-      step.quizData = {
-          question: `Pregunta de nivel ${missionIndex + 1} sobre ${worldId}`,
-          options: ["Opción A", "Opción B", "Opción C"],
-          correctIndex: 0,
-          explanation: "Respuesta basada en teoría."
-      }
-  }
   
-  return step;
+  return {
+     id: `gen-${worldId}-${missionIndex}`,
+     type: isBoss ? 'boss' : 'quiz',
+     title: genericTitles[missionIndex],
+     theory: "Contenido genérico de respaldo.",
+     content: "Este nivel está en mantenimiento por los magos del código.",
+     quizData: { question: "¿1+1?", options: ["2","3"], correctIndex: 0, explanation: "Básico." },
+     bossData: isBoss ? { name: "Placeholder Boss", hp: 100, playerMaxHp: 100, assetId: "skull_lord", questions: [{q:"Win?", options:["Yes"], correct:0, damageToBoss:100, damageToPlayer:0}] } : undefined
+  };
 };
 
 // --- WORLD DATA GENERATOR ---
@@ -410,6 +521,7 @@ const generateMissions = (worldId: string, worldName: string): Mission[] => {
             type: displayType,
             locked: i > 0,
             completed: false,
+            stars: 0,
             steps: [step]
         };
     });

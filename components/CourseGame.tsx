@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect, useRef } from 'react';
 import { Mission, CourseStep } from '../types';
 import { playSound } from '../utils/sound';
@@ -655,16 +657,6 @@ const CourseGame: React.FC<CourseGameProps> = ({ mission, onComplete, onBack }) 
           </div>
           
           <div className="flex items-center gap-3 flex-shrink-0">
-              {/* Theory Button */}
-              {step.theory && (
-                <button 
-                  onClick={() => { playSound('click'); setShowTheory(true); }} 
-                  className="px-3 py-1 bg-blue-900/50 hover:bg-blue-800 text-blue-200 text-xs font-pixel rounded border border-blue-700 transition-all whitespace-nowrap flex items-center gap-1 active:scale-95"
-                >
-                  <span className="text-lg">📖</span> <span className="hidden md:inline">GRIMORIO</span>
-                </button>
-              )}
-
               <div className="w-20 md:w-32 h-2 bg-slate-800 rounded-full border border-slate-600 overflow-hidden relative">
                     <div 
                         className="h-full bg-gradient-to-r from-blue-500 to-cyan-400 transition-all duration-500 shadow-[0_0_10px_rgba(59,130,246,0.8)]"
@@ -677,11 +669,13 @@ const CourseGame: React.FC<CourseGameProps> = ({ mission, onComplete, onBack }) 
           </div>
         </div>
 
-        {/* Content Area */}
-        <div className="flex-1 p-6 md:p-10 flex flex-col items-center justify-center w-full overflow-y-auto relative bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]">
+        {/* Content Area - REFACTORED SCROLLING CONTAINER */}
+        <div className="flex-1 w-full overflow-y-auto relative bg-[url('https://www.transparenttextures.com/patterns/carbon-fibre.png')]">
+          {/* Inner container with min-h-full ensures content centers when short but scrolls when tall */}
+          <div className="min-h-full p-4 md:p-10 flex flex-col items-center justify-center w-full">
           
           {step.type === 'content' && (
-            <div className="animate-pop w-full max-w-3xl bg-slate-900/90 border-2 border-slate-600 p-8 rounded-xl shadow-2xl relative my-auto">
+            <div className="animate-pop w-full max-w-3xl bg-slate-900/90 border-2 border-slate-600 p-8 rounded-xl shadow-2xl relative">
               {/* Decorative corners */}
               <div className="absolute top-0 left-0 w-4 h-4 border-t-2 border-l-2 border-yellow-500"></div>
               <div className="absolute top-0 right-0 w-4 h-4 border-t-2 border-r-2 border-yellow-500"></div>
@@ -711,7 +705,7 @@ const CourseGame: React.FC<CourseGameProps> = ({ mission, onComplete, onBack }) 
           )}
 
           {step.type === 'quiz' && step.quizData && (
-            <div className="w-full max-w-3xl animate-pop my-auto">
+            <div className="w-full max-w-3xl animate-pop">
               <div className="text-center mb-8">
                   <h3 className="text-2xl font-pixel text-purple-400 mb-2">DESAFÍO DE CONOCIMIENTO</h3>
                   <div className="h-1 w-24 bg-purple-600 mx-auto rounded-full"></div>
@@ -744,9 +738,9 @@ const CourseGame: React.FC<CourseGameProps> = ({ mission, onComplete, onBack }) 
           )}
 
           {step.type === 'minigame' && step.minigameData && (
-            <div className="animate-pop w-full flex flex-col items-center my-auto">
-              <h3 className="text-4xl font-pixel text-yellow-400 mb-2 drop-shadow-lg">SIMULACIÓN</h3>
-              <p className="text-slate-400 mb-8 font-mono text-sm uppercase">Entrenamiento Táctico</p>
+            <div className="animate-pop w-full flex flex-col items-center">
+              <h3 className="text-4xl font-pixel text-yellow-400 mb-2 drop-shadow-lg text-center">SIMULACIÓN</h3>
+              <p className="text-slate-400 mb-8 font-mono text-sm uppercase text-center">Entrenamiento Táctico</p>
               
               <div className="bg-slate-800/80 p-6 rounded-lg border border-slate-600 mb-8 max-w-2xl text-center shadow-lg">
                  <div className="text-xl md:text-2xl text-white font-serif">
@@ -777,8 +771,8 @@ const CourseGame: React.FC<CourseGameProps> = ({ mission, onComplete, onBack }) 
           )}
 
           {step.type === 'puzzle' && step.puzzleData && (
-            <div className="animate-pop w-full max-w-3xl flex flex-col items-center my-auto">
-                <h3 className="text-3xl font-pixel text-cyan-400 mb-2">DESCIFRADO LÓGICO</h3>
+            <div className="animate-pop w-full max-w-3xl flex flex-col items-center">
+                <h3 className="text-3xl font-pixel text-cyan-400 mb-2 text-center">DESCIFRADO LÓGICO</h3>
                 <div className="w-full bg-slate-900/50 p-6 rounded border border-cyan-900/50 mb-8 text-center">
                     <div className="text-slate-200 text-lg font-mono">
                         {renderFormattedText(step.puzzleData.instruction)}
@@ -826,9 +820,9 @@ const CourseGame: React.FC<CourseGameProps> = ({ mission, onComplete, onBack }) 
 
           {/* MEMORY MATCH (MEMORAMA) */}
           {step.type === 'memory' && step.memoryData && (
-            <div className="animate-pop w-full flex flex-col items-center my-auto">
-               <h3 className="text-3xl font-pixel text-pink-400 mb-2 drop-shadow-md">RUNAS DE LA MEMORIA</h3>
-               <p className="text-slate-400 mb-6 font-mono text-sm uppercase">Encuentra los pares sagrados</p>
+            <div className="animate-pop w-full flex flex-col items-center">
+               <h3 className="text-3xl font-pixel text-pink-400 mb-2 drop-shadow-md text-center">RUNAS DE LA MEMORIA</h3>
+               <p className="text-slate-400 mb-6 font-mono text-sm uppercase text-center">Encuentra los pares sagrados</p>
 
                <div className="grid grid-cols-2 md:grid-cols-4 gap-4 max-w-3xl w-full">
                   {memoryCards.map((card, idx) => {
@@ -872,9 +866,9 @@ const CourseGame: React.FC<CourseGameProps> = ({ mission, onComplete, onBack }) 
 
           {/* ALCHEMY LAB (NEW MINIGAME) */}
           {step.type === 'alchemy' && step.alchemyData && (
-             <div className="animate-pop w-full flex flex-col items-center my-auto">
-                <h3 className="text-3xl font-pixel text-lime-400 mb-2 drop-shadow-lg">LABORATORIO ALQUÍMICO</h3>
-                <p className="text-slate-400 mb-6 font-mono text-sm uppercase">Combina los elementos correctos</p>
+             <div className="animate-pop w-full flex flex-col items-center">
+                <h3 className="text-3xl font-pixel text-lime-400 mb-2 drop-shadow-lg text-center">LABORATORIO ALQUÍMICO</h3>
+                <p className="text-slate-400 mb-6 font-mono text-sm uppercase text-center">Combina los elementos correctos</p>
 
                 {/* GOAL DISPLAY */}
                 <div className="bg-slate-800 border-2 border-lime-600 p-4 rounded-lg mb-8 text-center shadow-[0_0_15px_rgba(132,204,22,0.3)]">
@@ -959,9 +953,9 @@ const CourseGame: React.FC<CourseGameProps> = ({ mission, onComplete, onBack }) 
 
           {/* CRYPTEX (NEW MINIGAME) */}
           {step.type === 'cryptex' && step.cryptexData && (
-             <div className="animate-pop w-full flex flex-col items-center my-auto">
-                 <h3 className="text-3xl font-pixel text-amber-500 mb-2 drop-shadow-lg">CRIPTEX ANCESTRAL</h3>
-                 <p className="text-slate-400 mb-6 font-mono text-sm uppercase">Resuelve las ecuaciones para abrir el sello</p>
+             <div className="animate-pop w-full flex flex-col items-center">
+                 <h3 className="text-3xl font-pixel text-amber-500 mb-2 drop-shadow-lg text-center">CRIPTEX ANCESTRAL</h3>
+                 <p className="text-slate-400 mb-6 font-mono text-sm uppercase text-center">Resuelve las ecuaciones para abrir el sello</p>
 
                  <div className="bg-slate-800/80 p-4 rounded border border-slate-600 mb-8 max-w-lg text-center">
                     <p className="text-white text-lg font-serif italic">"{step.cryptexData.instruction}"</p>
@@ -1018,9 +1012,9 @@ const CourseGame: React.FC<CourseGameProps> = ({ mission, onComplete, onBack }) 
 
           {/* MAZE (NEW MINIGAME) */}
           {step.type === 'maze' && step.mazeData && (
-             <div className="animate-pop w-full flex flex-col items-center my-auto">
-                 <h3 className="text-3xl font-pixel text-teal-400 mb-2 drop-shadow-lg">SENDA DE LA VERDAD</h3>
-                 <p className="text-slate-400 mb-6 font-mono text-sm uppercase">Recorre el camino correcto</p>
+             <div className="animate-pop w-full flex flex-col items-center">
+                 <h3 className="text-3xl font-pixel text-teal-400 mb-2 drop-shadow-lg text-center">SENDA DE LA VERDAD</h3>
+                 <p className="text-slate-400 mb-6 font-mono text-sm uppercase text-center">Recorre el camino correcto</p>
 
                  <div className="bg-slate-800/80 p-4 rounded border border-slate-600 mb-8 max-w-lg text-center shadow-lg">
                     <p className="text-white text-lg font-serif italic">"{renderInlineText(step.mazeData.instruction)}"</p>
@@ -1080,7 +1074,7 @@ const CourseGame: React.FC<CourseGameProps> = ({ mission, onComplete, onBack }) 
             const bossAsset = getCharacter(step.bossData.assetId);
 
             return (
-              <div className="w-full h-full flex flex-col relative">
+              <div className="w-full flex-grow flex flex-col relative min-h-[500px]">
                 
                 {/* BATTLE SCENE */}
                 <div className="flex-1 flex flex-col items-center justify-center relative bg-slate-950/90 rounded-lg overflow-hidden p-4">
@@ -1171,6 +1165,7 @@ const CourseGame: React.FC<CourseGameProps> = ({ mission, onComplete, onBack }) 
             );
           })()}
 
+          </div>
         </div>
       </div>
     </div>

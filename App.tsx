@@ -1,3 +1,5 @@
+
+
 import React, { useState, useEffect } from 'react';
 import { World, Mission, PlayerProfile } from './types';
 import { worldsData as initialWorldsData } from './data/algebraContent';
@@ -10,6 +12,17 @@ import InteractiveInfographic from './components/InteractiveInfographic';
 import { playSound } from './utils/sound';
 
 type Screen = 'lobby' | 'worlds' | 'missions' | 'game' | 'mindmap' | 'infographic';
+
+// Mapping of Codes to World IDs (The code unlocks THIS world and completes previous ones)
+const WORLD_PASSWORDS: Record<string, string> = {
+    "SIGNO": "w2",
+    "POTENCIA": "w3",
+    "TERMINO": "w4",
+    "NOTABLE": "w5",
+    "RAIZ": "w6",
+    "IGUALDAD": "w7",
+    "MATRIZ": "w8"
+};
 
 const App: React.FC = () => {
   const [screen, setScreen] = useState<Screen>('lobby');
@@ -41,6 +54,15 @@ const App: React.FC = () => {
   
   // Avatar Selection Modal
   const [showAvatarSelect, setShowAvatarSelect] = useState(false);
+
+  // Code System States
+  const [showUnlockModal, setShowUnlockModal] = useState(false);
+  const [unlockInput, setUnlockInput] = useState("");
+  const [unlockMessage, setUnlockMessage] = useState<{text: string, type: 'error' | 'success'} | null>(null);
+  
+  // Victory Modals
+  const [earnedCode, setEarnedCode] = useState<{code: string, worldName: string} | null>(null);
+  const [purifiedWorld, setPurifiedWorld] = useState<string | null>(null);
 
   // Persistence Effect
   useEffect(() => {
@@ -113,6 +135,50 @@ const App: React.FC = () => {
     }
   };
 
+  // --- PASSWORD / UNLOCK LOGIC ---
+  const handleUnlockClick = () => {
+      playSound('click');
+      setShowUnlockModal(true);
+      setUnlockInput("");
+      setUnlockMessage(null);
+  };
+
+  const submitUnlockCode = (e: React.FormEvent) => {
+      e.preventDefault();
+      const code = unlockInput.trim().toUpperCase();
+      const targetWorldId = WORLD_PASSWORDS[code];
+
+      if (targetWorldId) {
+          // Find index of target world
+          const targetIndex = worlds.findIndex(w => w.id === targetWorldId);
+          
+          if (targetIndex !== -1) {
+              const newWorlds = [...worlds];
+              
+              // Mark ALL previous worlds as fully completed
+              for (let i = 0; i < targetIndex; i++) {
+                  newWorlds[i] = {
+                      ...newWorlds[i],
+                      missions: newWorlds[i].missions.map(m => ({ ...m, completed: true, locked: false, stars: 3 }))
+                  };
+              }
+              
+              setWorlds(newWorlds);
+              setUnlockMessage({ text: "¡Código Aceptado! Viaje temporal realizado.", type: 'success' });
+              playSound('win');
+              setTimeout(() => {
+                  setShowUnlockModal(false);
+                  setScreen('worlds');
+              }, 1500);
+          } else {
+              setUnlockMessage({ text: "Error en la matriz del mundo.", type: 'error' });
+          }
+      } else {
+          setUnlockMessage({ text: "Código inválido o desconocido.", type: 'error' });
+          playSound('error');
+      }
+  };
+
   const handleWorldSelect = (world: World) => {
     // Check if the world is locked in the derived state
     const displayWorld = displayWorlds.find(w => w.id === world.id);
@@ -135,6 +201,20 @@ const App: React.FC = () => {
     playSound('start');
     setSelectedMission(mission);
     setScreen('game');
+  };
+
+  // Helper to determine code for the NEXT world
+  const getNextWorldCode = (currentWorldId: string) => {
+      const currentIndex = worlds.findIndex(w => w.id === currentWorldId);
+      if (currentIndex !== -1 && currentIndex < worlds.length - 1) {
+          const nextWorldId = worlds[currentIndex + 1].id;
+          // Reverse lookup the code
+          const entry = Object.entries(WORLD_PASSWORDS).find(([_, val]) => val === nextWorldId);
+          if (entry) {
+              return { code: entry[0], worldName: worlds[currentIndex + 1].name };
+          }
+      }
+      return null;
   };
 
   const handleMissionComplete = (starsEarned: number) => {
@@ -169,17 +249,84 @@ const App: React.FC = () => {
     });
 
     setWorlds(newWorlds);
-    
     setScreen('missions');
     
-    // Check if it was the last mission (Boss) to announce World Unlock
+    // Check if it was the last mission (Boss) to announce World Unlock AND CODE
     if (worldIsCompleted(selectedWorld, selectedMission)) {
-         setTimeout(() => {
-             alert("¡REINO COMPLETADO! El sello del siguiente mundo se ha roto.");
-             playSound('win');
-         }, 500);
+         playSound('win');
+         const nextCode = getNextWorldCode(selectedWorld.id);
+         
+         if (nextCode) {
+             if (isGodMode) {
+                 // ONLY Show Code Modal if GOD MODE is active
+                 setEarnedCode(nextCode);
+             } else {
+                 // Normal mode: Show Purification Modal
+                 setPurifiedWorld(selectedWorld.name);
+             }
+         } else {
+             setTimeout(() => {
+                 alert("¡HAS CONQUISTADO MATHORIA! Eres un verdadero Archimago.");
+             }, 500);
+         }
     }
   };
+
+  // --- HACK / SKIP LEVEL LOGIC ---
+  const handleHackNextLevel = () => {
+    if (!selectedWorld) return;
+
+    const currentWorldState = worlds.find(w => w.id === selectedWorld.id);
+    if (!currentWorldState) return;
+
+    // Find first locked mission
+    const firstLockedIndex = currentWorldState.missions.findIndex(m => m.locked);
+
+    // If all are unlocked (index -1), do nothing or check if last one is completed
+    if (firstLockedIndex === -1) {
+        // Check if the boss is completed
+        const boss = currentWorldState.missions[currentWorldState.missions.length - 1];
+        if(!boss.completed) {
+            // Very rare case where boss is unlocked but not completed, treat as normal mission logic below
+        } else {
+            alert("¡Ya has desbloqueado todo este reino!");
+            return;
+        }
+    }
+
+    const targetIndex = firstLockedIndex === -1 ? currentWorldState.missions.length - 1 : firstLockedIndex;
+
+    const newWorlds = worlds.map(world => {
+      if (world.id !== selectedWorld.id) return world;
+
+      const newMissions = [...world.missions];
+
+      // Unlock current target
+      newMissions[targetIndex] = { ...newMissions[targetIndex], locked: false };
+
+      // Complete previous if exists to maintain logic
+      if (targetIndex > 0) {
+          newMissions[targetIndex - 1] = { 
+              ...newMissions[targetIndex - 1], 
+              completed: true, 
+              stars: 1 
+          };
+      } else {
+          // If hacking the first level, just unlock it (it's usually unlocked anyway, but for safety)
+      }
+
+      // If we are hacking the BOSS or marking it complete via hack
+      // Note: Hacking essentially unlocks it to PLAY. 
+      // To SKIP playing, we need to mark TARGET as completed.
+      // Let's assume the button skips the NEED to play the previous one.
+      
+      return { ...world, missions: newMissions };
+    });
+
+    setWorlds(newWorlds);
+    playSound('success');
+  };
+
 
   // Helper to check if this was the final boss
   const worldIsCompleted = (world: World, mission: Mission) => {
@@ -368,9 +515,14 @@ const App: React.FC = () => {
               </button>
             </div>
 
-            <div className="mt-12">
-                 <button onClick={resetProgress} className="text-xs text-red-900 hover:text-red-500 transition-colors font-mono uppercase border-b border-dashed border-red-900 hover:border-red-500">
-                     Borrar Progreso
+            {/* LOWER UTILITIES */}
+            <div className="mt-12 flex gap-6">
+                 <button onClick={handleUnlockClick} className="px-4 py-2 bg-slate-800 border border-slate-600 hover:bg-slate-700 hover:border-white text-xs text-white font-mono rounded transition-colors shadow-lg flex items-center gap-2">
+                     <span className="text-yellow-400">💾</span> CARGAR PROGRESO
+                 </button>
+
+                 <button onClick={resetProgress} className="px-4 py-2 bg-slate-900/50 border border-red-900/50 hover:bg-red-900/20 hover:border-red-500 text-xs text-red-700 hover:text-red-400 font-mono rounded transition-colors">
+                     Borrar Datos
                  </button>
             </div>
           </div>
@@ -384,7 +536,8 @@ const App: React.FC = () => {
           <MissionSelect 
             world={currentDisplayWorld} 
             onSelectMission={handleMissionSelect} 
-            onBack={() => { playSound('click'); setScreen('worlds'); }} 
+            onBack={() => { playSound('click'); setScreen('worlds'); }}
+            onSkipLevel={handleHackNextLevel}
           />
         )}
 
@@ -405,7 +558,119 @@ const App: React.FC = () => {
         )}
       </div>
 
-      {/* GOD MODE MODAL */}
+      {/* --- MODALS SECTION --- */}
+
+      {/* 1. EARNED CODE MODAL (GOD MODE VICTORY) */}
+      {earnedCode && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/90 backdrop-blur-md p-4 animate-pop">
+              <div className="bg-gradient-to-br from-yellow-900 to-slate-900 border-4 border-yellow-500 rounded-xl p-8 max-w-md w-full text-center shadow-[0_0_100px_rgba(234,179,8,0.5)] relative overflow-hidden">
+                  <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/diagmonds-light.png')] opacity-10"></div>
+                  
+                  <div className="text-6xl mb-4 animate-bounce">🗝️</div>
+                  <h3 className="text-2xl md:text-3xl font-pixel text-yellow-400 mb-2 drop-shadow-md">¡REINO COMPLETADO!</h3>
+                  <p className="text-slate-300 font-mono text-sm mb-6">
+                      Has demostrado tu valía. Guarda este código antiguo para regresar directamente a:
+                  </p>
+                  
+                  <div className="bg-black/60 border-2 border-yellow-700 rounded-lg p-6 mb-2">
+                      <div className="text-yellow-200 text-xs font-bold uppercase tracking-widest mb-2">PRÓXIMO DESTINO: {earnedCode.worldName}</div>
+                      <div className="text-4xl md:text-5xl font-mono font-bold text-white tracking-widest select-all selection:bg-yellow-500 selection:text-black">
+                          {earnedCode.code}
+                      </div>
+                  </div>
+                  <p className="text-[10px] text-slate-500 mb-6 uppercase">Cópialo o anótalo en tu bitácora</p>
+
+                  <button 
+                    type="button"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        setEarnedCode(null);
+                        setSelectedWorld(null);
+                        setScreen('worlds');
+                        playSound('click');
+                    }}
+                    className="w-full py-4 bg-yellow-600 hover:bg-yellow-500 text-black font-bold font-pixel text-lg rounded shadow-lg transition-all active:scale-95 cursor-pointer relative z-50"
+                  >
+                    CONTINUAR VIAJE
+                  </button>
+              </div>
+          </div>
+      )}
+
+      {/* 2. PURIFIED MODAL (NORMAL MODE VICTORY) */}
+      {purifiedWorld && (
+          <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/90 backdrop-blur-md p-4 animate-fadeIn">
+              <div className="bg-gradient-to-br from-emerald-900 to-slate-900 border-4 border-emerald-500 rounded-xl p-8 max-w-md w-full text-center shadow-[0_0_100px_rgba(16,185,129,0.5)] relative overflow-hidden">
+                  <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/stardust.png')] opacity-20"></div>
+                  
+                  <div className="text-6xl mb-4 animate-pulse">✨</div>
+                  <h3 className="text-2xl md:text-3xl font-pixel text-emerald-400 mb-4 drop-shadow-md">¡REINO PURIFICADO!</h3>
+                  <div className="h-1 w-24 bg-emerald-600 mx-auto rounded-full mb-6"></div>
+                  
+                  <p className="text-slate-200 font-serif text-lg italic mb-2">
+                      "La oscuridad se disipa de {purifiedWorld}."
+                  </p>
+                  <p className="text-slate-400 font-mono text-xs mb-8">
+                      El camino hacia el siguiente desafío se ha abierto.
+                  </p>
+
+                  <button 
+                    type="button"
+                    onClick={(e) => {
+                        e.stopPropagation();
+                        setPurifiedWorld(null);
+                        setSelectedWorld(null);
+                        setScreen('worlds');
+                        playSound('click');
+                    }}
+                    className="w-full py-4 bg-emerald-700 hover:bg-emerald-600 border-b-4 border-emerald-900 text-white font-bold font-pixel text-sm rounded shadow-lg transition-all active:translate-y-1 active:border-b-0 cursor-pointer relative z-50"
+                  >
+                    AVANZAR
+                  </button>
+              </div>
+          </div>
+      )}
+
+      {/* 3. UNLOCK CODE INPUT MODAL (LOAD GAME) */}
+      {showUnlockModal && (
+        <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fadeIn">
+          <div className="bg-slate-900 border-2 border-slate-500 rounded-xl p-8 max-w-sm w-full shadow-2xl relative">
+            <button onClick={() => setShowUnlockModal(false)} className="absolute top-2 right-2 text-slate-400 hover:text-white">✕</button>
+            
+            <div className="text-center mb-6">
+              <div className="text-4xl mb-2">💾</div>
+              <h3 className="text-xl font-pixel text-slate-200">CARGAR PROGRESO</h3>
+              <p className="text-xs text-slate-400 font-mono mt-2">Introduce un código de mundo para saltar.</p>
+            </div>
+
+            <form onSubmit={submitUnlockCode} className="flex flex-col gap-4">
+              <input 
+                type="text" 
+                value={unlockInput}
+                onChange={(e) => setUnlockInput(e.target.value)}
+                placeholder="CÓDIGO (Ej: SIGNO)"
+                className="w-full bg-slate-950 border border-slate-700 rounded p-4 text-center text-white font-mono text-xl uppercase tracking-widest focus:border-yellow-500 focus:outline-none focus:ring-1 focus:ring-yellow-500"
+                autoFocus
+              />
+              
+              {unlockMessage && (
+                <div className={`text-xs text-center font-bold p-2 rounded ${unlockMessage.type === 'error' ? 'bg-red-900/30 text-red-400' : 'bg-green-900/30 text-green-400'}`}>
+                  {unlockMessage.text}
+                </div>
+              )}
+
+              <button 
+                type="submit"
+                className="w-full py-3 bg-slate-700 hover:bg-slate-600 text-white font-pixel text-xs rounded shadow-lg transition-all"
+              >
+                DESBLOQUEAR
+              </button>
+            </form>
+          </div>
+        </div>
+      )}
+
+      {/* 4. GOD MODE MODAL */}
       {showGodModeModal && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fadeIn">
           <div className="bg-slate-900 border-2 border-purple-500 rounded-xl p-8 max-w-sm w-full shadow-[0_0_50px_rgba(168,85,247,0.4)] relative">
@@ -449,7 +714,7 @@ const App: React.FC = () => {
         </div>
       )}
 
-      {/* AVATAR SELECTOR MODAL */}
+      {/* 5. AVATAR SELECTOR MODAL */}
       {showAvatarSelect && (
         <div className="fixed inset-0 z-[200] flex items-center justify-center bg-black/90 backdrop-blur-sm p-4 animate-fadeIn">
             <div className="bg-slate-900 border-2 border-blue-500 rounded-xl p-8 max-w-2xl w-full relative">

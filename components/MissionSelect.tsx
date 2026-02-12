@@ -1,3 +1,4 @@
+
 import React from 'react';
 import { Mission, World } from '../types';
 
@@ -5,9 +6,10 @@ interface MissionSelectProps {
   world: World;
   onSelectMission: (mission: Mission) => void;
   onBack: () => void;
+  onSkipLevel?: () => void; // New optional prop
 }
 
-const MissionSelect: React.FC<MissionSelectProps> = ({ world, onSelectMission, onBack }) => {
+const MissionSelect: React.FC<MissionSelectProps> = ({ world, onSelectMission, onBack, onSkipLevel }) => {
   // Calculate Progress
   const totalMissions = world.missions.length;
   const completedMissions = world.missions.filter(m => m.completed).length;
@@ -28,6 +30,17 @@ const MissionSelect: React.FC<MissionSelectProps> = ({ world, onSelectMission, o
              >
                 ← Mapa
              </button>
+
+             {/* HACK BUTTON */}
+             {onSkipLevel && completedMissions < totalMissions && (
+                 <button 
+                    onClick={onSkipLevel}
+                    className="absolute top-4 right-4 px-3 py-1 bg-red-900/40 hover:bg-red-900/80 text-red-300 border border-red-500/30 hover:border-red-500 rounded font-mono text-[10px] uppercase tracking-widest backdrop-blur-sm transition-all"
+                    title="Desbloquear siguiente nivel sin jugar (Cheat)"
+                 >
+                    ⚡ Hackear Acceso
+                 </button>
+             )}
 
              <div className="text-8xl md:text-9xl filter drop-shadow-[0_0_20px_rgba(255,255,255,0.4)] animate-float">
                 {world.emoji}
